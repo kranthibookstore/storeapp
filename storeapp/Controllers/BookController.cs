@@ -1,5 +1,7 @@
 ﻿using BookStore.EFLib.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using storeapp.Dtos;
 using storeapp.Model;
 using storeapp.Services;
@@ -17,7 +19,8 @@ namespace storeapp.Controllers
         {
             _bookService = bookService;
         }
-        
+
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
         {
@@ -50,33 +53,43 @@ namespace storeapp.Controllers
             return CreatedAtAction(nameof(GetBook), new {id = book.Title}, book);
         }
 
-        [HttpPut("{id}")]
-        //public async Task<ActionResult<BookModel>> UpdateBook(int id)
-        //{
-        //    var book = await _bookService.GetBookById(id);
-        //    if (book == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return Ok(new BookModel
-        //    {
-        //        Id = book.BookId,
-        //        Title = book.Title,
-        //        AuthorId = book.AuthorId,
-        //        Price = book.Price,
-        //        PublishedDate = book.PublishedDate,
-        //        Stock = book.Stock
-        //    });
-        //}
-
-
-        public async Task<IActionResult> UpdateBook(int id, [FromBody] Book book)
+        [HttpPut]
+        public async Task<ActionResult<BookModel>> UpdateBook(BookModel book)
         {
-            await _bookService.UpdateBookAsync(id, book);
-            return NoContent();
+            if (book.Id <= 0)
+            {
+                return NotFound();
+            }
+            try
+            {
+                await _bookService.UpdateBookAsync(book);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!bookExists(book.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return Ok(new BookModel
+            {
+                Id = book.Id,
+                Title = book.Title,
+                AuthorId = book.AuthorId,
+                Price = book.Price,
+                PublishedDate = book.PublishedDate,
+                Stock = book.Stock
+            });
         }
 
-
+        private bool bookExists(int id)
+        {
+            throw new NotImplementedException();
+        }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBook(int id)

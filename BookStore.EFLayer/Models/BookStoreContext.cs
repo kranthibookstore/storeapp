@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace BookStore.EFLib.Models;
+namespace BookStore.EFLayer.Models;
 
 public partial class BookStoreContext : DbContext
 {

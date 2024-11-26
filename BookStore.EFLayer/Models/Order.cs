@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace BookStore.EFLib.Models;
+namespace BookStore.EFLayer.Models;
 
 public partial class Order
 {

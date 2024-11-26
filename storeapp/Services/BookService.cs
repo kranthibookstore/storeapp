@@ -1,4 +1,5 @@
 ﻿
+using AutoMapper;
 using BookStore.EFLib.Models;
 using storeapp.Model;
 using storeapp.Repositories;
@@ -9,12 +10,12 @@ namespace storeapp.Services
     public class BookService : IBookService
     {
         private readonly IBookRepository _bookRepository;
-        //private readonly IMapper _mapper;
+        private readonly IMapper _mapper;
 
-        public BookService(IBookRepository bookRepository) 
+        public BookService(IBookRepository bookRepository, IMapper mapper) 
         {
             _bookRepository = bookRepository;
-            //_mapper = mapper;
+            _mapper = mapper;
         }
         public async Task AddBookAsync(BookModel book)
         {
@@ -44,7 +45,7 @@ namespace storeapp.Services
         public async Task<Book> GetBookById(int id)
         {
             var result = await _bookRepository.GetAllBooksAsync();
-            return result.Where(_ => _.BookId == id).First();
+            return result.FirstOrDefault(_ => _.BookId == id)!;
         }
 
         public async Task<Book> GetBookByIdAsync(int id)
@@ -56,11 +57,18 @@ namespace storeapp.Services
         }
     
 
-        public async Task UpdateBookAsync(int id, Book book)
+        public async Task UpdateBookAsync(BookModel book)
         {
-           // var book = _mapper.Map<Book>(book);
-            book.BookId = id;
-            await _bookRepository.UpdateBookAsync(book);
+            var bookUpdate = new Book
+            {
+                BookId = book.Id,
+                Title = book.Title,
+                AuthorId = book.AuthorId,
+                Price = book.Price,
+                PublishedDate = book.PublishedDate,
+                Stock = book.Stock
+            };
+            await _bookRepository.UpdateBookAsync(bookUpdate);
         }
 
        

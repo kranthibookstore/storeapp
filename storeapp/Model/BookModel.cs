@@ -1,4 +1,6 @@
-﻿namespace storeapp.Model
+﻿using BookStore.EFLib.Models;
+
+namespace storeapp.Model
 {
     public class BookModel
     {
@@ -13,5 +15,6 @@
         public DateOnly? PublishedDate { get; set; }
 
         public int Stock { get; set; }
+
     }
 }

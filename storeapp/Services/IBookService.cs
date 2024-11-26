@@ -9,7 +9,7 @@ namespace storeapp.Services
         Task<IEnumerable<Book>> GetAllBookAsync();
         Task<Book> GetBookById(int id);
         Task AddBookAsync(BookModel book);
-        Task UpdateBookAsync(int id, Book book);
+        Task UpdateBookAsync(BookModel book);
         Task DeleteBookAsync(int id);
         
     }

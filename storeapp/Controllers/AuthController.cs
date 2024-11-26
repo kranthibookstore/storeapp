@@ -1,79 +1,83 @@
-﻿using Microsoft.AspNetCore.Identity.Data;
+﻿using BookStore.EFLib.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using storeapp.Services;
 using System.Text;
-using Microsoft.AspNetCore.Authorization;
-using BookStore.EFLib.Models;
 
 namespace storeapp.Controllers
 {
-
+    [Route("api/[Controller]")]
     [ApiController]
-    [Route("api/auth")]
-    //[Authorize]
-    public class AuthController : ControllerBase
+    public class AuthController : Controller
     {
-        private readonly IUserService _userService;
-        private readonly IConfiguration _configuration;
+        public IConfiguration _configuration;
 
-        public AuthController(IUserService usersService, IConfiguration configuration)
+        public AuthController(IConfiguration config)
         {
-            _userService = usersService;
-            _configuration = configuration;
+            _configuration = config;
         }
 
-        //[HttpPost("login")]
-        //public async Task<IActionResult> Login([FromBody] LoginRequest request)
-        //{
-        //    var user = await _userService.AuthenticateAsync(request.Username, request.Password);
-        //    if (user == null) 
-        //        return Unauthorized("Invalide username or password");
-
-        //    var token = GenerateJwtToken(user);
-        //    return Ok(new { Token =token  });
-        //}
-
-        //[HttpPost("Register")]
-        //public async Task<IActionResult> Register([FromBody] RegisterRequest request)
-        //{
-        //    if (await _userService.UserExistsAsync(request.Username))
-        //        return BadRequest("User already exists");
-
-        //    var user = await _userService.RegisterAsunc(request.Username, request.Password);
-            
-
-        //    return Ok(new { Message = "User registred sucessfully" });
-
-        //}
-
-
-        private string GenerateJwtToken(User  user)
+        [HttpPost]
+        public IActionResult Post(string username = "test", string password = "test@123")
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var claims = new[]
+            if (username != null && password != null)
             {
-                new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Role,user.Role),
-            };
+                var user = new User
+                {
+                    Id = 101,
+                    Username = username,
+                    PasswordHash = password,
+                    DisplayName = "Kranthi Kumar",
+                    Email = "kumar@mail.com",
+                    UserId = "Q101",
+                    FirstName = "Kranthi",
+                    LastName = "Kumar"
+                };
 
-            var token = new JwtSecurityToken(
-                _configuration["Jwt:Issuer"],
-                _configuration["Jwt:Issuer"],
-                claims,
-                expires: DateTime.Now.AddHours(3),
-                signingCredentials: credentials);
+                if (user != null) //&& _configuration != null
+                {
+                    //create claims details based on the user information
+                    var claims = new[] {
+                        new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
+                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                        new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
+                        new Claim("UserId", user.UserId.ToString()),
+                        new Claim("DisplayName", user.DisplayName),
+                        new Claim("UserName", user.Username),
+                        new Claim("Email", user.Email)
+                    };
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+                    var jwtTocken = GenerateToken(user, claims);
+
+                    return Ok(new { jwtTocken, user });
+                }
+                else
+                {
+                    return BadRequest("Invalid credentials");
+                }
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
-        
+
+        private string GenerateToken(User user, Claim[] claims)
+        {
+            // generate token that is valid for 30 minutes
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Audience = _configuration["Jwt:Audience"],
+                Issuer = _configuration["Jwt:Issuer"],
+                Expires = DateTime.UtcNow.AddMinutes(30),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
     }
 }
-
-
-
