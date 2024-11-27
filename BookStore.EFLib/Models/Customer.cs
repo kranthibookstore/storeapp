@@ -14,4 +14,7 @@ public partial class Customer
     public string? Phone { get; set; }
 
     public string? Address { get; set; }
+
+    public string? PasswordHash { get; set; }
+    public DateTime RegisterAt { get; set; }
 }

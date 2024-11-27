@@ -9,18 +9,18 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace storeapp.Controllers
 {
+    [Authorize]
     [Route("api/[Controller]")]
     [ApiController]
     public class BookController : Controller
     {
         private readonly IBookService _bookService;
 
-        public BookController(IBookService bookService) 
+        public BookController(IBookService bookService)
         {
             _bookService = bookService;
         }
 
-        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
         {

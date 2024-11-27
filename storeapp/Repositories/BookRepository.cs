@@ -1,5 +1,6 @@
 ﻿using BookStore.EFLib.Models;
 using Microsoft.EntityFrameworkCore;
+using storeapp.Model;
 
 namespace storeapp.Repositories
 {
