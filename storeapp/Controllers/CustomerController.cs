@@ -1,9 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BookStore.EFLib.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using storeapp.DTOs;
 using storeapp.Services;
+using System.Data;
 
 namespace storeapp.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class CustomerController : Controller
     {
         private readonly ICustomerService _customerService;
@@ -16,7 +21,7 @@ namespace storeapp.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] CustomerRegistrationDto registrationDto)
         {
-            if(string.IsNullOrEmpty(registrationDto.Password) || string.IsNullOrEmpty(registrationDto.Email))
+            if (string.IsNullOrEmpty(registrationDto.Password) || string.IsNullOrEmpty(registrationDto.Email))
             {
                 return BadRequest(new { message = "Email and Password are required." });
             }
@@ -51,6 +56,43 @@ namespace storeapp.Controllers
                     customer.Address
                 }
             });
-        }
+
+
+            //[HttpGet("{id}")]
+            //public async Task<ActionResult<Customer>> GetCustomer(int id)
+            //{
+            //     var customer = await _customerService.Customers.FindAsync(id);
+
+            //    if(customer == null)
+            //        return NotFound();
+            //    return customer;
+            //}
+
+           // [HttpPut("{id}")]
+        //public  async Task<IActionResult>PutCustomer(int id, Customer customer)
+        //{
+        //    if (id != customer.CustomerId)
+        //        BadRequest();
+
+            //    _customerService.Entry(customer).State = EntityState.Modified;
+
+            //    try
+            //    {
+            //        await _customerService.SaveChangesAsync();
+            //    }
+            //    catch (DbUpdateConcurrencyException)
+            //    {
+            //        if(!_customerService.Customers.Any(equals => e.Id == id))
+            //            return NotFound();
+
+            //        throw;
+            //    }
+
+            //    return NoContent();
+            //}
+
+
+    }
+
     }
 }
