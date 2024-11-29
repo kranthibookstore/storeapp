@@ -7,5 +7,8 @@ namespace storeapp.Repositories
     {
         Task<bool>RegisterCustomerAsync (Customer customer);
         Task<Customer?> AuthenticateCustomerAsync( string email, string password );
+
+        Task<Customer> GetCustomerByIdAsync(int id);
+        Task  UpdateCustomerAsync(Customer customer);
     }
 }

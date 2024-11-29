@@ -36,6 +36,17 @@ namespace storeapp.Repositories
             return true;
         }
 
-        
+        public async Task<Customer> GetCustomerByIdAsync(int id)
+        {
+            return await _dbContext.Customers.FindAsync(id);
+        }
+
+        public async Task UpdateCustomerAsync(Customer customer)
+        {
+            _dbContext.Customers.Update(customer);
+            await _dbContext.SaveChangesAsync();
+        }
+
+       
     }
 }

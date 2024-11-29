@@ -35,5 +35,14 @@ namespace storeapp.Services
             return await _customerRepository.AuthenticateCustomerAsync(loginDto.Email, loginDto.Password);
         }
 
+        public async Task<Customer> GetCustomerByIdAsync(int id)
+        {
+            return await _customerRepository.GetCustomerByIdAsync(id);
+        }
+
+        public async Task UpdateCustomerAsync(Customer customer)
+        {
+            await _customerRepository.UpdateCustomerAsync(customer);
+        }
     }
 }

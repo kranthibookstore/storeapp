@@ -56,43 +56,47 @@ namespace storeapp.Controllers
                     customer.Address
                 }
             });
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetCustomerById(int id)
+        {
+            var customer = await _customerService.GetCustomerByIdAsync(id);
+
+            if (customer == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(customer);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateCustomer(int id, [FromBody] Customer customer)
+        {
+            if (id != customer.CustomerId)
+            {
+                return BadRequest("Customer Id missmatch");
+            }
+
+            var existingCustomer = await _customerService.GetCustomerByIdAsync(id);
+            if (existingCustomer == null)
+            {
+                return NotFound("Customer not found");
+            }
+
+            existingCustomer.Name = customer.Name; ;
+            existingCustomer.Email = customer.Email;
+            existingCustomer.Phone = customer.Phone;
+            existingCustomer.Address = customer.Address;
+
+            await _customerService.UpdateCustomerAsync(existingCustomer);
+            return NoContent();
 
 
-            //[HttpGet("{id}")]
-            //public async Task<ActionResult<Customer>> GetCustomer(int id)
-            //{
-            //     var customer = await _customerService.Customers.FindAsync(id);
-
-            //    if(customer == null)
-            //        return NotFound();
-            //    return customer;
-            //}
-
-           // [HttpPut("{id}")]
-        //public  async Task<IActionResult>PutCustomer(int id, Customer customer)
-        //{
-        //    if (id != customer.CustomerId)
-        //        BadRequest();
-
-            //    _customerService.Entry(customer).State = EntityState.Modified;
-
-            //    try
-            //    {
-            //        await _customerService.SaveChangesAsync();
-            //    }
-            //    catch (DbUpdateConcurrencyException)
-            //    {
-            //        if(!_customerService.Customers.Any(equals => e.Id == id))
-            //            return NotFound();
-
-            //        throw;
-            //    }
-
-            //    return NoContent();
-            //}
+        }
 
 
     }
 
-    }
 }

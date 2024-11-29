@@ -8,5 +8,8 @@ namespace storeapp.Services
     {
         Task<bool> RegisterCustomerAsync(CustomerRegistrationDto registrationDto);
         Task<Customer?> LoginCustomerAsync(CustomerLoginDto loginDto);
+
+        Task<Customer> GetCustomerByIdAsync(int id);
+        Task UpdateCustomerAsync(Customer customer);
     }
 }
